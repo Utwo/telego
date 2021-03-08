@@ -1,0 +1,29 @@
+version: "3.7"
+services:
+  teleport-go-worker:
+    container_name: go-worker
+    working_dir: /go/src/telego
+    env_file: .env
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ~/.config/gcloud:/root/.config/gcloud
+      - .:/go/src/telego
+      - $GOPATH/pkg/mod/cache:/go/pkg/mod/cache
+    ports:
+      - ${PORT}:${PORT}
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:13-alpine
+    ports:
+      - ${POSTGRES_PORT_EXTERNAL}:5432
+    env_file: .env
+    volumes:
+      - "db-go:/data/db"
+
+volumes:
+  db-go:
+    driver: local
