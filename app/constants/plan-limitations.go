@@ -1,15 +1,15 @@
 package constants
 
-type planLimitations struct {
+type PlanLimitations struct {
 	MaxCollaboratorsInProject         uint8
 	MaxRealTimeCollaboratorsInProject uint8
 	MaxProjectsForUser                uint8
-	MaxAssetsSizeForProject           uint16
-	MaxAssetsForProject               uint8
+	MaxAssetsSizeForProject           int64
+	MaxAssetsForProject               uint16
 	MaxUploadBatch                    uint8
 }
 
-var DefaultPlanLimitations = planLimitations{
+var DefaultPlanLimitations = PlanLimitations{
 	MaxCollaboratorsInProject:         20,
 	MaxRealTimeCollaboratorsInProject: 5,
 	MaxProjectsForUser:                20,
@@ -18,7 +18,7 @@ var DefaultPlanLimitations = planLimitations{
 	MaxUploadBatch:                    20,
 }
 
-var AnonymousPlanLimitations = planLimitations{
+var AnonymousPlanLimitations = PlanLimitations{
 	MaxCollaboratorsInProject:         0,
 	MaxRealTimeCollaboratorsInProject: 0,
 	MaxProjectsForUser:                3,

@@ -10,6 +10,24 @@ type CustomValidator struct {
 	Validator *validator.Validate
 }
 
-func (cv *CustomValidator) Validate(i interface{}) error {
-	return echo.NewHTTPError(http.StatusInternalServerError, cv.Validator.Struct(i).Error())
+func (cv CustomValidator) Validate(i interface{}) error {
+	//if err := cv.Validator.Struct(i); err != nil {
+	//	return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	//}
+	return nil
+}
+
+func ValidateRequest(p interface{}) func(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			if err := c.Bind(p); err != nil {
+				return echo.ErrBadRequest
+			}
+			if err := c.Validate(p); err != nil {
+				return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+			}
+			c.Set("body", p)
+			return next(c)
+		}
+	}
 }

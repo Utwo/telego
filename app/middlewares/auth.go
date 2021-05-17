@@ -5,13 +5,12 @@ import (
 	"firebase.google.com/go/v4/auth"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
-	"log"
 	"strings"
 	"telego/app/models"
 	"telego/app/services"
 )
 
-var Auth = func(isOptional bool) func(next echo.HandlerFunc) echo.HandlerFunc {
+func Auth(isOptional bool) func(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			authHeader := c.Request().Header.Get("Authorization")
@@ -33,13 +32,14 @@ var Auth = func(isOptional bool) func(next echo.HandlerFunc) echo.HandlerFunc {
 				return echo.ErrForbidden
 			}
 
-			log.Printf("Verified ID token: %v\n", token)
 			db := c.Get("db").(*gorm.DB)
+			//log.Printf("Verified ID token: %v\n", token.Claims)
 			account := models.Account{
-				AuthId: token.UID,
-				//Name:                  token.Firebase.Identities,
-				//Email:                 "",
-				//Picture:               "",
+				AuthId:  token.UID,
+				Name:    token.Claims["name"].(string),
+				Email:   token.Claims["email"].(string),
+				Picture: token.Claims["picture"].(string),
+				//TODO: add identities
 			}
 			tx := db.Where(models.Account{AuthId: account.AuthId}).FirstOrCreate(&account)
 			if tx.RowsAffected > 0 && !account.IsAnonymous {
@@ -47,7 +47,7 @@ var Auth = func(isOptional bool) func(next echo.HandlerFunc) echo.HandlerFunc {
 				// TODO: handleActiveInvitations
 				services.SendWelcomeMail(account.Email, account.Name)
 			}
-			c.Set("account", account)
+			c.Set("account", &account)
 			return next(c)
 		}
 	}
