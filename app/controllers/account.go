@@ -2,12 +2,13 @@ package controllers
 
 import (
 	"errors"
-	"github.com/labstack/echo/v4"
-	"gorm.io/gorm"
 	"net/http"
 	"telego/app/models"
 	"telego/app/utils"
 	"telego/app/validators"
+
+	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 )
 
 var GetAuthenticated = func(c echo.Context) error {
